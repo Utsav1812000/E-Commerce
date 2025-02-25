@@ -1,47 +1,35 @@
 import React from "react";
-import { Typography } from "antd";
-// import { Line } from "@ant-design/charts";
 import "antd/dist/reset.css";
+import OrderSummary from "../orders/OrderSummary";
+import SalesAnalyticsChart from "../../common/charting/SalesAnalyticsChart ";
+import { Card, Row, Col } from "antd";
 
 const Dashboard = () => {
-    // const [isModalOpen, setIsModalOpen] = useState(false);
-    // const [form] = Form.useForm();
-    // const [selectedMenuItem, setSelectedMenuItem] = useState("dashboard");
-
-    //   const salesData = [
-    //     { date: "2024-02-01", sales: 500 },
-    //     { date: "2024-02-02", sales: 700 },
-    //     { date: "2024-02-03", sales: 650 },
-    //   ];
-
-    // const DashboardContent = () => (
-    //     <Typography.Title level={4}>Dashboard Overview</Typography.Title>
-    // );
+    const salesData = [
+        { date: "2024-02-01", sales: 5000 },
+        { date: "2024-02-05", sales: 12000 },
+        { date: "2024-02-10", sales: 8000 },
+        { date: "2024-02-15", sales: 15000 },
+        { date: "2024-02-20", sales: 13000 },
+        { date: "2024-02-25", sales: 18000 },
+    ];
 
     return (
-        <Typography.Title style={{ color: "black", margin: 0 }}>Dashboard Loading..</Typography.Title>
-        // <Layout style={{ minHeight: "100vh" }}>
-        //     <HeaderComponent />
-        //     <Layout>
-        //         <SiderComponent />
-        //         <Content style={{ padding: 20 }}>
-        //             <Order />
-        //             <Products />
-        //             <Modal title="Manage Inventory" open={isModalOpen} onCancel={() => setIsModalOpen(false)} onOk={() => form.submit()}>
-        //                 <Form form={form} layout="vertical">
-        //                     <Form.Item name="name" label="Product Name" rules={[{ required: true }]}> <Input /> </Form.Item>
-        //                     <Form.Item name="sku" label="SKU" rules={[{ required: true }]}> <Input /> </Form.Item>
-        //                     <Form.Item name="price" label="Price" rules={[{ required: true }]}> <InputNumber min={0} style={{ width: "100%" }} /> </Form.Item>
-        //                     <Form.Item name="stock" label="Stock Quantity" rules={[{ required: true }]}> <InputNumber min={0} style={{ width: "100%" }} /> </Form.Item>
-        //                     <Form.Item name="status" label="Status" valuePropName="checked"> <Switch /> </Form.Item>
-        //                 </Form>
-        //             </Modal>
-        //         </Content>
-        //     </Layout>
-
-        //     <Layout>
-        //     </Layout>
-        // </Layout>
+        <div style={{ width: "100%", padding: "20px", display: "flex", flexDirection: "column", gap: "20px" }}>
+            <OrderSummary
+                totalOrders={150}
+                pendingOrders={20}
+                completedOrders={130}
+                revenue={450000.75}
+            />
+            <Card title="Sales Analytics" bordered >
+                <Row gutter={[12, 12]} justify="space-between">
+                    <Col xs={24} sm={24} md={24} lg={24} xl={24}>
+                        <SalesAnalyticsChart salesData={salesData} />
+                    </Col>
+                </Row>
+            </Card>
+        </div>
     );
 };
 

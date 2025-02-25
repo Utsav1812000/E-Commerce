@@ -13,9 +13,9 @@ export default function SiderComponent() {
                 <Menu.Item key="2">
                     <Link to="/products">Products</Link>
                 </Menu.Item>
-                <Menu.Item key="3">
+                {/* <Menu.Item key="3">
                     <Link to="/orders">Orders</Link>
-                </Menu.Item>
+                </Menu.Item> */}
             </Menu>
         </Sider>
     )

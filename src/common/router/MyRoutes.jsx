@@ -10,9 +10,7 @@ export default function MyRoutes() {
                         key={routes.path}
                         path={routes.path}
                         exact={routes.exact}
-                        // Component={routes.component}
                         element={<routes.component />}
-                    // element= {routes.isAuthenticated ? <Protected Component={routes.component} /> : <routes.component/>} 
                     />
                 )
             })}

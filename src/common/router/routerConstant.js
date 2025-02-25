@@ -1,24 +1,21 @@
 import Dashboard from "../../components/dashboard/Dashboard";
-import Order from "../../components/orders/Order";
+import OrderSummary from "../../components/orders/OrderSummary";
 import Products from "../../components/products/Products";
 
 export const routerConstant = [
   {
     path: "/orders",
     exact: true,
-    component: Order,
-    // isAuthenticated: true,
+    component: OrderSummary,
   },
   {
     path: "/products",
     exact: true,
     component: Products,
-    // isAuthenticated: true,
   },
   {
     path: "/dashboard",
     exact: true,
     component: Dashboard,
-    // isAuthenticated: true,
   },
 ];

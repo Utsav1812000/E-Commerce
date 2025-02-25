@@ -1,73 +1,31 @@
 // src/components/Products.js
-import React, { useEffect, useState } from "react";
-import { Table, Button, Form, Card, Modal, Input, InputNumber, Switch } from "antd";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import React, { useState } from "react";
+import { Table, Button, Card, Input } from "antd";
+import { EditOutlined, DeleteOutlined, SearchOutlined } from "@ant-design/icons";
+import { ProductData } from "./ProductData";
+import AddProduct from "./AddProduct";
 
 const { Column } = Table;
 
 const Products = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [form] = Form.useForm();
-
-    const [products, setProducts] = useState([
-        { id: 1, name: "Product A", sku: "SKU123", price: 50, stock: 20, status: "Active" },
-        { id: 2, name: "Product B", sku: "SKU124", price: 70, stock: 15, status: "Inactive" },
-    ]);
-    // const products = [
-    //     { id: 1, name: "Product A", sku: "SKU123", price: 50, stock: 20, status: "Active" },
-    //     { id: 2, name: "Product B", sku: "SKU124", price: 70, stock: 15, status: "Inactive" },
-    // ];
-
+    const [searchText, setSearchText] = useState("");
+    const [products, setProducts] = useState(ProductData);
+    const [filteredProducts, setFilteredProducts] = useState(ProductData);
     const [editingProduct, setEditingProduct] = useState(null);
+  
 
-    useEffect(() => {
-        if (isModalOpen) {
-            form.setFieldsValue(editingProduct || { name: "", sku: "", price: 0, stock: 0, status: false });
-        }
-    }, [isModalOpen, editingProduct, form]);
-
-    // useEffect(() => {
-    //     if (editingProduct) {
-    //         form.setFieldsValue({
-    //             name: editingProduct.name,
-    //             sku: editingProduct.sku,
-    //             price: editingProduct.price,
-    //             stock: editingProduct.stock,
-    //             status: editingProduct.status === "Active",
-    //         });
-    //     } else {
-    //         form.resetFields();
-    //     }
-    // }, [editingProduct, form]);
-
-    const handleOk = async () => {
-        try {
-            const values = await form.validateFields();
-            const newProduct = {
-                id: editingProduct ? editingProduct.id : products.length + 1,
-                name: values.name,
-                sku: values.sku,
-                price: values.price,
-                stock: values.stock,
-                status: values.status ? "Active" : "Inactive"
-            };
-
-            if (editingProduct) {
-                setProducts(products.map(p => (p.id === editingProduct.id ? newProduct : p)));
-            } else {
-                setProducts([...products, newProduct]);
-            }
-
-            form.resetFields();
-            setIsModalOpen(false);
-            setEditingProduct(null);
-        } catch (error) {
-            console.log("Validation Failed!", error);
+    const handleSaveProduct = (newProduct) => {
+        if (editingProduct) {
+            setProducts(products.map(p => (p.id === editingProduct.id ? newProduct : p)));
+            setFilteredProducts(filteredProducts.map(p => (p.id === editingProduct.id ? newProduct : p)));
+        } else {
+            setProducts([...products, newProduct]);
+            setFilteredProducts([...filteredProducts, newProduct]);
         }
     };
 
     const openAddModal = () => {
-        form.resetFields();
         setEditingProduct(null);
         setIsModalOpen(true);
     };
@@ -81,48 +39,63 @@ const Products = () => {
     const deleteProducts = (pId) => {
         const updatedProductList = products.filter(product => product.id !== pId);
         setProducts(updatedProductList);
-    }
+        setFilteredProducts(updatedProductList);
+    };
+
+    const handleSearch = (e) => {
+        const value =  e.target.value.toLowerCase();
+        setSearchText(value);
+        if(!value){
+            setFilteredProducts(products);
+        } else {
+            const filtered = products.filter(item => 
+                item.name.toLowerCase().includes(value) || 
+                item.sku.toLowerCase().includes(value)  ||
+                item.status.toLowerCase().includes(value)
+            );
+            setFilteredProducts(filtered);
+        }
+    };
 
     return (
         <Card title="Product Listing" 
-        extra={<Button type="primary" onClick={openAddModal}> Add New Product </Button>}>
-            <Table dataSource={products} rowKey="id">
+        extra={
+        <div style={{ display: "flex", gap: "10px", alignItems: "center", justifyContent: "flex-end" }}>
+            <Input
+                    placeholder="Search products..."
+                    value={searchText}
+                    onChange={handleSearch}
+                    prefix={<SearchOutlined />}
+                    style={{ width: "60%", maxWidth: 300 }}
+                />
+            <Button type="primary" onClick={openAddModal} style={{ minWidth: "150px" }}> Add New Product </Button>
+        </div>
+        }>
+            <Table dataSource={filteredProducts} rowKey="id" scroll={{ x: "max-content" }} pagination={{ pageSize: 5 }}>
                 <Column title="Name" dataIndex="name" />
                 <Column title="SKU" dataIndex="sku" />
-                <Column title="Price" dataIndex="price" render={(price) => `$${price}`} />
-                <Column title="Stock" dataIndex="stock" />
-                <Column title="Status" dataIndex="status" />
+                <Column title="Price" dataIndex="price" render={(price) => `$${price}`} sorter={(a, b) => a.price - b.price} />
+                <Column title="Stock" dataIndex="stock" sorter={(a, b) => a.stock - b.stock} />
+                <Column title="Status" dataIndex="status" sorter={(a, b) => a.status.localeCompare(b.status)} />
                 <Column
                     title="Actions"
                     render={(p) => (
-                        <>
+                        <div style={{ display: "flex", gap: "8px" }}>
                             <Button icon={<EditOutlined />} onClick={() => openEditModal(p)} />
-                            <Button icon={<DeleteOutlined />} danger style={{ marginLeft: 8 }} onClick={() => deleteProducts(p.id)} />
-                        </>
+                            <Button icon={<DeleteOutlined />} danger onClick={() => deleteProducts(p.id)} />
+                        </div>
                     )}
                 />
             </Table>
 
             {/* Inventory Management Modal */}
-            <Modal title={editingProduct ? "Edit Product" : "Add Product"} open={isModalOpen} onCancel={() => setIsModalOpen(false)} onOk={handleOk}>
-                <Form form={form} layout="vertical">
-                    <Form.Item name="name" label="Product Name" rules={[{ required: true, message: "Please enter product name" }]}>
-                        <Input />
-                    </Form.Item>
-                    <Form.Item name="sku" label="SKU" rules={[{ required: true, message: "Please enter SKU" }]}>
-                        <Input />
-                    </Form.Item>
-                    <Form.Item name="price" label="Price" rules={[{ required: true, message: "Please enter price" }]}>
-                        <InputNumber min={0} style={{ width: "100%" }} />
-                    </Form.Item>
-                    <Form.Item name="stock" label="Stock Quantity" rules={[{ required: true, message: "Please enter stock quantity" }]}>
-                        <InputNumber min={0} style={{ width: "100%" }} />
-                    </Form.Item>
-                    <Form.Item name="status" label="Status" valuePropName="checked">
-                        <Switch />
-                    </Form.Item>
-                </Form>
-            </Modal>
+            <AddProduct
+                isModalOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSave={handleSaveProduct}
+                editingProduct={editingProduct}
+                products={products}
+            />
         </Card>
     );
 };

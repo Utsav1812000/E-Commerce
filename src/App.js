@@ -14,9 +14,9 @@ function App() {
       <Layout>
         <SiderComponent />
         {/* <Dashboard /> */}
-        <Content style={{ padding: 20 }}>
-          <MyRoutes />
-        </Content>
+          <Content style={{ padding: 20 }}>
+            <MyRoutes />
+          </Content>
       </Layout>
     </Layout>
   );
